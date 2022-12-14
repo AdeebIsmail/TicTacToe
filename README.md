@@ -1,2 +1,4 @@
 # TicTacToe
-Simple text based tic tac toe game
+TicTacToe game made in python with turtle graphics
+
+Run in terminal
