@@ -1,17 +1,12 @@
 
-
 import turtle as turtle
 import numpy as np
 
-s = turtle.getscreen()
-turtle.speed(0)
-turtle.penup()
-turtle.hideturtle()
 
 
 def drawBoard():
-    turtle.goto(-30, 385)
-    turtle.write("TicTacToe", font=("Verdana", 11, "normal"))
+    turtle.goto(-30, 400)
+    turtle.write("Connect 4", font=("Verdana", 11, "normal"))
     turtle.goto(-400, -350)
     turtle.pendown()
     turtle.forward(800)
@@ -107,13 +102,16 @@ def drawCircle(color, r, c):
     x = -400
     y = -350
     if color == 'red':
-        turtle.pencolor('red')
+        turtle.fillcolor('red')
     else:
-        turtle.pencolor('black')
+        turtle.fillcolor('black')
     turtle.penup()
-    turtle.goto(x + ((c + 1) * (800 / 7)) - ((800 / 7) / 2), y + (6 - r) * (700 / 6) - 10)
+    turtle.goto(x + ((c + 1) * (800 / 7)) - ((800 / 7) / 2),
+                y + (6 - r) * (700 / 6) - 10)
     turtle.pendown()
+    turtle.begin_fill()
     turtle.circle(50)
+    turtle.end_fill()
 
 
 def check_up(game_board, count, start, c, player):
@@ -198,7 +196,7 @@ def check_other_diagonal_up(game_board, count, r, c, player):
     return check_other_diagonal_up(game_board, count, r - 1, c + 1, player)
 
 
-def valid_input(r, c):
+def valid_input(board, r, c):
     try:
         if board[r][c] == 0.0 and r != 5 and board[r + 1][c] != 0.0:
             return True
@@ -209,61 +207,78 @@ def valid_input(r, c):
         return False
 
 
-drawBoard()
-board = np.zeros(shape=(6, 7))
-
-while True:
-    row = int(input('Player 1: Enter the Row Coordinate: '))
-    col = int(input('Player 1: Enter the Col Coordinate: '))
-    while not valid_input(row, col):
+def ask_input(player, board):
+    row = int(input('Player ' + str(player) + ': Enter the Row Coordinate: '))
+    col = int(input('Player ' + str(player) + ': Enter the Col Coordinate: '))
+    while not valid_input(board, row, col):
         print('\nTry Again\n')
-        row = int(input('Player 1: Enter the Row Coordinate: '))
-        col = int(input('Player 1: Enter the Col Coordinate: '))
-    board[row][col] = 1.0
-    drawCircle('red', row, col)
-    # print('------------------------')
-    # print(board)
-    # print('------------------------')
-    if check_up(board, 0, 0, col, 1.0):
-        print('\nPlayer 1 wins\n')
-        turtle.done()
-        break
-    if check_side(board, 0, 0, row, 1.0):
-        print('\nPlayer 1 wins\n')
-        turtle.done()
-        break
-    if check_diagonal_down(board, 0, row, col, 1.0) + check_diagonal_up(board, 0, row, col, 1.0) == 5:
-        print('\nPlayer 1 wins\n')
-        break
-    if check_other_diagonal_down(board, 0, row, col, 1.0) + check_other_diagonal_up(board, 0, row, col, 1.0) == 5:
-        print('\nPlayer 1 wins\n')
-        turtle.done()
-        break
-    row = int(input('Player 2: Enter the Row Coordinate: '))
-    col = int(input('Player 2: Enter the Col Coordinate: '))
-    while not valid_input(row, col):
-        print('\nTry Again\n')
-        row = int(input('Player 2: Enter the Row Coordinate: '))
-        col = int(input('Player 2: Enter the Col Coordinate: '))
-    board[row][col] = 2.0
-    drawCircle('black', row, col)
-    # print('------------------------')
-    # print(board)
-    # print('------------------------')
-    if check_up(board, 0, 0, col, 2.0):
-        print('\nPlayer 2 wins\n')
-        turtle.done()
-        break
-    if check_side(board, 0, 0, row, 2.0):
-        print('\nPlayer 2 wins\n')
-        turtle.done()
-        break
-    if check_diagonal_down(board, 0, row, col, 2.0) + check_diagonal_up(board, 0, row, col, 2.0) == 5:
-        print('\nPlayer 2 wins\n')
-        turtle.done()
-        break
-    if check_other_diagonal_down(board, 0, row, col, 2.0) + check_other_diagonal_up(board, 0, row, col, 2.0) == 5:
-        print('\nPlayer 2 wins\n')
-        turtle.done()
-        break
+        row = int(input('Player ' + str(player) +
+                  ': Enter the Row Coordinate: '))
+        col = int(input('Player ' + str(player) +
+                  ': Enter the Col Coordinate: '))
+    if player == 1:
+        board[row][col] = 1.0
+    else:
+        board[row][col] = 2.0
+    return (row, col)
 
+
+def play_game():
+    s = turtle.getscreen()
+    turtle.speed(0)
+    turtle.penup()
+    turtle.hideturtle()
+    board = np.zeros(shape=(6, 7))
+    drawBoard()
+    while True:
+        try:
+            row, col = ask_input(1, board)
+        except:
+            continue
+        drawCircle('red', row, col)
+        # print('------------------------')
+        # print(board)
+        # print('------------------------')
+        if check_up(board, 0, 0, col, 1.0):
+            print('\nPlayer 1 wins\n')
+            turtle.done()
+            break
+        if check_side(board, 0, 0, row, 1.0):
+            print('\nPlayer 1 wins\n')
+            turtle.done()
+            break
+        if check_diagonal_down(board, 0, row, col, 1.0) + check_diagonal_up(board, 0, row, col, 1.0) == 5:
+            print('\nPlayer 1 wins\n')
+            break
+        if check_other_diagonal_down(board, 0, row, col, 1.0) + check_other_diagonal_up(board, 0, row, col, 1.0) == 5:
+            print('\nPlayer 1 wins\n')
+            turtle.done()
+            break
+        try:
+            row, col = ask_input(2, board)
+        except:
+            continue
+        drawCircle('black', row, col)
+        # print('------------------------')
+        # print(board)
+        # print('------------------------')
+        if check_up(board, 0, 0, col, 2.0):
+            print('\nPlayer 2 wins\n')
+            turtle.done()
+            break
+        if check_side(board, 0, 0, row, 2.0):
+            print('\nPlayer 2 wins\n')
+            turtle.done()
+            break
+        if check_diagonal_down(board, 0, row, col, 2.0) + check_diagonal_up(board, 0, row, col, 2.0) == 5:
+            print('\nPlayer 2 wins\n')
+            turtle.done()
+            break
+        if check_other_diagonal_down(board, 0, row, col, 2.0) + check_other_diagonal_up(board, 0, row, col, 2.0) == 5:
+            print('\nPlayer 2 wins\n')
+            turtle.done()
+            break
+    root.mainloop()
+
+
+play_game()
